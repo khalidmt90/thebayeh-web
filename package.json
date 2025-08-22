@@ -1,0 +1,29 @@
+{
+  "name": "thebayeh-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Next.js 14 App Router implementation (Phase 0 constraints)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.3",
+    "react": "18.3.1",
+  "react-dom": "18.3.1",
+  "@supabase/supabase-js": "2.45.3",
+  "@radix-ui/react-slot": "1.2.3",
+  "class-variance-authority": "0.7.1",
+  "clsx": "2.1.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "10.4.19",
+    "postcss": "8.4.38",
+    "tailwindcss": "3.4.9",
+    "typescript": "5.5.4",
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0"
+  }
+}
