@@ -1,5 +1,5 @@
 "use client"
-import { Button } from '@/components/ui/button'
+import { OptionCard } from '../OptionCard'
 import type { OrderDraft } from '../types'
 
 const cookingOptions = [
@@ -12,9 +12,9 @@ export default function StepCooking({ value, onChange }: { value: OrderDraft; on
   return (
     <div className="space-y-4">
       <h2 className="heading-3">الطبخ</h2>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         {cookingOptions.map(c => (
-          <Button key={c.id} variant={value.cooking===c.id ? 'brand':'outline'} onClick={()=> onChange({ cooking: c.id })}>{c.label}</Button>
+          <OptionCard key={c.id} value={c.id} title={c.label} selected={value.cooking===c.id || (c.id==='none' && !value.cooking)} onSelect={v=> onChange({ cooking: v==='none'? undefined : v })} size="sm" />
         ))}
       </div>
     </div>

@@ -1,5 +1,5 @@
 "use client"
-import { Button } from '@/components/ui/button'
+import { OptionCard } from '../OptionCard'
 import type { OrderDraft } from '../types'
 
 const extrasList = [
@@ -18,9 +18,11 @@ export default function StepExtras({ value, onChange }: { value: OrderDraft; onC
   return (
     <div className="space-y-4">
       <h2 className="heading-3">إضافات</h2>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-3">
         {extrasList.map(e => (
-            <Button key={e.id} variant={value.extras.includes(e.id) ? 'brand':'outline'} onClick={()=> toggle(e.id)}>{e.label}</Button>
+          <div key={e.id}>
+            <OptionCard value={e.id} title={e.label} selected={value.extras.includes(e.id)} onSelect={()=> toggle(e.id)} size="sm" />
+          </div>
         ))}
       </div>
     </div>

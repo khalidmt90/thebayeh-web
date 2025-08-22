@@ -1,5 +1,5 @@
 "use client"
-import { Button } from '@/components/ui/button'
+import { OptionCard } from '../OptionCard'
 import type { OrderDraft } from '../types'
 
 const cuts = [
@@ -12,9 +12,9 @@ export default function StepCut({ value, onChange }: { value: OrderDraft; onChan
   return (
     <div className="space-y-4">
       <h2 className="heading-3">التقسيم</h2>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         {cuts.map(c => (
-          <Button key={c.id} variant={value.cut===c.id ? 'brand':'outline'} onClick={()=> onChange({ cut: c.id })}>{c.label}</Button>
+          <OptionCard key={c.id} value={c.id} title={c.label} selected={value.cut===c.id} onSelect={v=> onChange({ cut: v })} size="sm" />
         ))}
       </div>
     </div>

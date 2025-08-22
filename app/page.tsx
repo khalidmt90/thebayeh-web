@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import HeroParallax from '@/components/site/HeroParallax'
 
 // Homepage (moved out of route group to avoid Vercel ENOENT on (site) manifest)
 
@@ -37,15 +38,15 @@ export default function Home() {
         <div className="content-width grid gap-12 lg:grid-cols-2 items-center">
           <div className="space-y-6 order-2 lg:order-1">
             <h1 className="heading-1 leading-tight tracking-tight">
-              {ar ? 'جودة راقية. تجربة سهلة. طلبك بأفضل صورة.' : 'Premium Quality. Effortless Experience.'}
+              {ar ? 'اطلب ذبيحتك بسهولة وجودة عالية' : 'Order your livestock easily with high quality'}
             </h1>
-            <p className="text-textMuted text-sm md:text-base max-w-xl leading-relaxed">
-              {ar ? 'من اختيار الذبيحة حتى التسليم—كل شيء منظم وواضح.' : 'From selection to delivery—transparent & smooth.'}
+            <p className="text-textMuted text-base max-w-xl leading-relaxed">
+              {ar ? 'اختيار، تجهيز، وتسليم—كلها بخطوات بسيطة.' : 'Selection, preparation, delivery—simple steps.'}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/order"><Button variant="brand" size="lg" className="px-8 h-14 text-base font-semibold shadow-md-soft">{ar ? 'ابدأ طلب مخصص' : 'Start Custom Order'}</Button></Link>
-              <a href="#quick-presets" className="inline-flex items-center text-sm font-medium text-primary hover:opacity-80 transition-colors">
-                {ar ? 'تصفح الطلبات الجاهزة' : 'Browse Presets'}
+              <a href="#quick-presets" className="inline-flex items-center text-sm font-semibold text-white bg-black rounded-full px-5 h-12 hover:bg-black/90 transition-colors">
+                {ar ? 'اختر من الطلبات الجاهزة' : 'Choose Presets'}
               </a>
             </div>
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-textMuted">
@@ -55,9 +56,7 @@ export default function Home() {
             </ul>
           </div>
           <div className="order-1 lg:order-2">
-            <div className="relative panel overflow-hidden aspect-[16/9] bg-dots">
-              <Image src="/images/brand-hero.svg" alt={ar ? 'البيّه' : 'Hero'} fill priority sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 50vw" className="object-contain p-6" fetchPriority="high" />
-            </div>
+            <HeroParallax />
           </div>
         </div>
       </section>

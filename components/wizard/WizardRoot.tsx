@@ -1,5 +1,5 @@
 "use client"
-import { useState, useRef, useCallback, useMemo } from 'react'
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import type { WizardPrefill, OrderDraft } from './types'
 import StepIntent from './steps/StepIntent'
 import StepCut from './steps/StepCut'
@@ -21,11 +21,12 @@ export default function WizardRoot({ prefill }: { prefill: WizardPrefill }) {
   const [draft, setDraft] = useState<OrderDraft>(() => ({ extras: [] }))
   const [stepIndex, setStepIndex] = useState(0)
 
-  // apply prefill once (post mount to avoid hydration mismatch if any dynamic logic later)
-  if (!initialized.current) {
+  // hygiene: map intent to meatType only once (extend model in future)
+  useEffect(()=>{
+    if (initialized.current) return
     initialized.current = true
     setDraft(d => ({ ...d, ...prefill }))
-  }
+  }, [prefill])
 
   const step = STEPS[stepIndex]
 
@@ -49,44 +50,54 @@ export default function WizardRoot({ prefill }: { prefill: WizardPrefill }) {
   function back() { setStepIndex(i => Math.max(i-1, 0)) }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-10 grid lg:grid-cols-[1fr_340px] gap-8">
-      <div>
-        <ProgressBar current={stepIndex} total={STEPS.length} />
-        <div className="mt-6 rounded-2xl border bg-backgroundAlt p-5 min-h-[420px]">
-          {step === 'intent' && <StepIntent value={draft} onChange={update} />}
-          {step === 'cut' && <StepCut value={draft} onChange={update} />}
-          {step === 'fulfillment' && <StepFulfillment value={draft} onChange={update} />}
-          {step === 'cooking' && <StepCooking value={draft} onChange={update} />}
-          {step === 'extras' && <StepExtras value={draft} onChange={update} />}
-          {step === 'schedule' && <StepSchedule value={draft} onChange={update} />}
-          {step === 'review' && <StepReview value={draft} />}
+    <div className="relative">
+      <div className="mx-auto max-w-6xl grid lg:grid-cols-[1fr_360px] gap-10 px-4 lg:px-6 pt-6 pb-40 min-h-[calc(100vh-80px)]">
+        <div className="flex flex-col">
+          <ProgressHeader current={stepIndex} total={STEPS.length} onBack={back} disableBack={stepIndex===0} />
+          <div className="relative mt-6 flex-1 overflow-hidden">
+            <div className="h-full w-full relative">
+              <Slide active={step==='intent'}><StepIntent value={draft} onChange={update} /></Slide>
+              <Slide active={step==='cut'}><StepCut value={draft} onChange={update} /></Slide>
+              <Slide active={step==='fulfillment'}><StepFulfillment value={draft} onChange={update} /></Slide>
+              <Slide active={step==='cooking'}><StepCooking value={draft} onChange={update} /></Slide>
+              <Slide active={step==='extras'}><StepExtras value={draft} onChange={update} /></Slide>
+              <Slide active={step==='schedule'}><StepSchedule value={draft} onChange={update} /></Slide>
+              <Slide active={step==='review'}><StepReview value={draft} /></Slide>
+            </div>
+          </div>
         </div>
-        <div className="mt-5 flex items-center justify-between gap-4">
-          <Button variant="outline" disabled={stepIndex===0} onClick={back}>{'‹'} {"رجوع"}</Button>
+        <aside className="hidden lg:block pt-16">
+          <div className="sticky top-24">
+            <SummaryCard draft={draft} step={step} />
+          </div>
+        </aside>
+      </div>
+  <div className="fixed inset-x-0 bottom-0 z-50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-t shadow-sm">
+        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center gap-4">
+          <Button variant="outline" disabled={stepIndex===0} onClick={back} className="min-w-[120px] h-12">{'‹'} {"رجوع"}</Button>
           {step !== 'review' ? (
-            <Button variant="brand" disabled={!canNext} onClick={next} className="px-8">{"التالي"} ›</Button>
+            <Button variant="brand" disabled={!canNext} onClick={next} className="flex-1 h-12 text-base font-semibold">{"التالي"} ›</Button>
           ) : (
-            <Button variant="brand" disabled={!canNext} className="px-8">{"إرسال الطلب"}</Button>
+            <Button variant="brand" disabled={!canNext} className="flex-1 h-12 text-base font-semibold">{"إرسال الطلب"}</Button>
           )}
+          <MobileMiniSummary draft={draft} />
         </div>
       </div>
-      {/* Desktop Sticky Summary */}
-      <aside className="hidden lg:block">
-        <div className="sticky top-6 space-y-4">
-          <SummaryCard draft={draft} step={step} />
-        </div>
-      </aside>
-      {/* Mobile slide-up summary */}
-      <MobileMiniSummary draft={draft} />
     </div>
   )
 }
 
-function ProgressBar({ current, total }: { current: number; total: number }) {
+function ProgressHeader({ current, total, onBack, disableBack }: { current: number; total: number; onBack: ()=>void; disableBack?: boolean }) {
   const pct = ((current+1)/total)*100
   return (
-    <div className="h-2 rounded-full bg-border overflow-hidden">
-      <div className="h-full bg-primary transition-all" style={{ width: pct+'%' }} />
+    <div>
+      <div className="flex items-center justify-between">
+        <button type="button" onClick={onBack} disabled={disableBack} className="text-sm text-textMuted disabled:opacity-40">رجوع</button>
+        <div className="text-xs font-medium text-textMuted">الخطوة {current+1} من {total}</div>
+      </div>
+      <div className="mt-3 h-2 rounded-full bg-border overflow-hidden">
+        <div className="h-full bg-primary transition-all" style={{ width: pct+'%' }} />
+      </div>
     </div>
   )
 }
@@ -127,23 +138,30 @@ function MobileMiniSummary({ draft }: { draft: OrderDraft }) {
   const [open, setOpen] = useState(false)
   const est = useMemo(()=> estimateTotal(draft), [draft])
   return (
-    <div className={clsx('lg:hidden fixed inset-x-0 bottom-0 z-40 transition-transform', open ? '' : '')}>
-      <div className="mx-4 mb-4 rounded-2xl border bg-white shadow-lg p-4">
-        <div className="flex items-center justify-between" onClick={()=> setOpen(o=>!o)}>
-          <div className="text-sm font-medium">الملخص</div>
-          <button className="text-xs text-primary" type="button">{open ? 'إخفاء' : 'إظهار'}</button>
-        </div>
-        {open && (
-          <div className="mt-3 space-y-2 text-[11px]">
-            <div className="flex flex-wrap gap-2">
-              {draft.intent && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.intent}</span>}
-              {draft.size && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.size}</span>}
-              {draft.cut && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.cut}</span>}
-              {draft.fulfillment && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.fulfillment}</span>}
-            </div>
-            <div className="text-sm font-semibold">{est.toLocaleString('ar-SA')} ر.س</div>
+    <div className="lg:hidden">
+      <button type="button" onClick={()=> setOpen(o=>!o)} className="h-12 px-4 rounded-lg border bg-backgroundAlt text-xs font-medium">
+        {open ? 'إخفاء الملخص' : 'عرض الملخص'}
+      </button>
+      {open && (
+        <div className="absolute bottom-16 inset-x-0 mx-4 mb-4 rounded-2xl border bg-white shadow-lg p-4 space-y-3">
+          <div className="flex flex-wrap gap-2 text-[11px]">
+            {draft.intent && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.intent}</span>}
+            {draft.size && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.size}</span>}
+            {draft.cut && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.cut}</span>}
+            {draft.fulfillment && <span className="px-2 py-1 rounded-full bg-backgroundAlt border">{draft.fulfillment}</span>}
           </div>
-        )}
+          <div className="text-sm font-semibold">{est.toLocaleString('ar-SA')} ر.س</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Slide({ active, children }: { active: boolean; children: React.ReactNode }) {
+  return (
+    <div className={clsx('absolute inset-0 transition-all duration-200 ease-out motion-reduce:transition-none', active ? 'opacity-100 translate-x-0 pointer-events-auto':'opacity-0 translate-x-8 pointer-events-none')}>
+      <div className="h-full rounded-3xl border bg-backgroundAlt p-6 overflow-y-auto will-change-transform">
+        {children}
       </div>
     </div>
   )

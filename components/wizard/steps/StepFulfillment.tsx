@@ -1,5 +1,5 @@
 "use client"
-import { Button } from '@/components/ui/button'
+import { OptionCard } from '../OptionCard'
 import type { OrderDraft } from '../types'
 
 const fulfillments = [
@@ -12,9 +12,9 @@ export default function StepFulfillment({ value, onChange }: { value: OrderDraft
   return (
     <div className="space-y-4">
       <h2 className="heading-3">طريقة التلبية</h2>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         {fulfillments.map(f => (
-          <Button key={f.id} variant={value.fulfillment===f.id ? 'brand':'outline'} onClick={()=> onChange({ fulfillment: f.id })}>{f.label}</Button>
+          <OptionCard key={f.id} value={f.id} title={f.label} selected={value.fulfillment===f.id} onSelect={v=> onChange({ fulfillment: v })} size="sm" />
         ))}
       </div>
     </div>
