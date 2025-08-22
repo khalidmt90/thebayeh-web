@@ -1,11 +1,6 @@
 import '../styles/globals.css'
 import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
-import { Noto_Naskh_Arabic, Inter } from 'next/font/google'
-
-// Arabic primary, Latin fallback
-const arabic = Noto_Naskh_Arabic({ subsets: ['arabic'], weight: ['400','500','600','700'], variable: '--font-arabic', display: 'swap' })
-const inter = Inter({ subsets: ['latin'], variable: '--font-latin', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'البيّه – ذبائح مهيأة بجودة راقية',
@@ -31,16 +26,7 @@ export const metadata: Metadata = {
   }
 }
 
+// Nested layout: DO NOT re-declare <html>/<body>; handled by root layout.
 export default function SiteLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="ar" dir="rtl" className={`${arabic.variable} ${inter.variable} font-sans`}>
-      <head>
-        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
-          <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} crossOrigin="anonymous" />
-        )}
-        <link rel="preload" as="image" href="/images/brand-hero.svg" fetchPriority="high" />
-      </head>
-      <body>{children}</body>
-    </html>
-  )
+  return <>{children}</>
 }
