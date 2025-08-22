@@ -8,9 +8,26 @@ const arabic = Noto_Naskh_Arabic({ subsets: ['arabic'], weight: ['400','500','60
 const inter = Inter({ subsets: ['latin'], variable: '--font-latin', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'البيّه',
-  description: 'منصة الذبح والطلبات – الإصدار Next.js (Phase 0)',
-  icons: { icon: '/favicon.ico' }
+  title: 'البيّه – ذبائح مهيأة بجودة راقية',
+  description: 'منصة طلب الذبائح واللحوم بخيارات مخصصة وتوصيل سريع. جودة موثوقة وتجربة سهلة.',
+  icons: { icon: '/favicon.ico' },
+  metadataBase: new URL('https://thebayeh.example'),
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: 'البيّه – جودة وتجربة سهلة',
+    description: 'اختر واطلب الذبيحة مع تجهيز وتسليم موثوق.',
+    url: 'https://thebayeh.example/',
+    siteName: 'البيّه',
+    images: [ { url: '/images/brand-hero.svg', width: 1600, height: 900, alt: 'Hero' } ],
+    locale: 'ar_SA',
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'البيّه – ذبائح مهيأة بجودة راقية',
+    description: 'اختر واطلب الذبيحة مع تجهيز وتسليم موثوق.',
+    images: ['/images/brand-hero.svg']
+  }
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
